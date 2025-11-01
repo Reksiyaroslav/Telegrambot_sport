@@ -16,6 +16,23 @@ async def get_url(number):
             return "https://en.wikipedia.org/wiki/Lorem_ipsum"
         case 2:
             return"https://fbref.com/en/squads/206d90db/2024-2025/Barcelona-Stats"
+async def parsing(url,name_clan:str,type_operation)->str:
+    async with aiohttp.ClientSession() as session:
+            reponse = await session.get(url=url,headers=heanders) #получения  ответа от сайта 
+            reponse_text = await reponse.text()
+            with open(f"html/index_{type_operation}_{name_clan.lower()}.html","w")as file :
+                file.write(reponse_text)
+            return reponse_text
+async def full_text(list_text:list):
+    return "\n".join(text for text in list_text)
+async def create_json(list_type:list,name_clan:str,type_operation):
+    with open(f"data/{type_operation}_{name_clan.lower()}.json","w") as fille:
+        json.dump(list_type,fille,indent=3,ensure_ascii=False)
+    return f"Create json {type_operation}"
+async def load_html(name_clan:str,type_operaion:str):
+    with open(f"html/index_{type_operaion}_{name_clan.lower()}.html") as file :
+        text_html = file.read()
+    return text_html
 #Получения данных об Loream пассхалка
 async def parsing_loream ()->str:
     url = "https://en.wikipedia.org/wiki/Lorem_ipsum"  #url википедей 
@@ -98,17 +115,10 @@ async def plaers_list(name_clan:str)->str:
             url ="https://www.soccer.ru/real"
         case "bavariya":
             url = "https://www.soccer.ru/bavariya?tournament=1380758"
-    if not os.path.exists(f"html/index_players_{name_clan}.html"):
-        async with aiohttp.ClientSession() as session:
-            reponse = await session.get(url=url,headers=heanders) #получения  ответа от сайта 
-            reponse_text = await reponse.text()
-            with open(f"html/index_players_{name_clan}.html","w")as file :
-                file.write(reponse_text)
-            src = reponse_text
-    
+    if not os.path.exists(f"html/index_players_{name_clan.lower()}.html"):
+        src = await parsing(url,name_clan,"players")
     else:
-        with open(f"html/index_players_{name_clan}.html") as file :
-            src = file.read()
+            src = await load_html(name_clan,"players")
     if not os.path.exists(f"data/data/players_{name_clan.lower()}.json"):
         soup_Text = BeautifulSoup(src,"lxml")
         tbody_list = soup_Text.find_all("tbody")
@@ -119,8 +129,7 @@ async def plaers_list(name_clan:str)->str:
             await load_data_players(plaers_list_used,"Played")
             await load_data_players(plaers_list_not_used,"Reves")
             print(list_players)
-            with open(f"data/players_{name_clan.lower()}.json","w") as fille:
-                json.dump(list_players,fille,indent=3,ensure_ascii=False)
+        await create_json(list_players,name_clan,"players")
     return "God data"
 async def schedule(name_clan:str):
     match name_clan.lower():
@@ -131,46 +140,40 @@ async def schedule(name_clan:str):
         case "bavariya":
             url = "https://www.euro-football.ru/team/bavariya/match_comming"
     if not os.path.exists(f"html/index_schedule_{name_clan}.html"):
-        async with aiohttp.ClientSession() as session:
-            reponse = await session.get(url=url,headers=heanders) #получения  ответа от сайта 
-            reponse_text = await reponse.text()
-            with open(f"html/index_schedule_{name_clan}.html","w")as file :
-                file.write(reponse_text)
-            src = reponse_text
+        src = await parsing(url,name_clan,"schedule")
     else:
-        with open(f"html/index_schedule_{name_clan}.html") as file :
-            src = file.read()
+        src = await load_html(name_clan,"schedule")
     soup_Text = BeautifulSoup(src,"lxml")
-    match name_clan.lower():
-        case "barselona":
-            div_matches= soup_Text.find_all("div",class_ ='matches-list-match')
-            await load_data_schedule(div_matches,name_clan)
-        case "real madrit":
+    
+    if  name_clan.lower() == "barselona":     
+        div_matches= soup_Text.find_all("div",class_ ='matches-list-match')
+        await load_data_schedule(div_matches,name_clan)
+    elif name_clan.lower()=="real madrit" or name_clan.lower()=="bavariya":
             div_team_match_list = soup_Text.find("div",class_= "team-match-list team-match-list_turnir")
             div_team_match__item = div_team_match_list.find_all("div",class_="team-match__item")
             await load_data_schedule(div_team_match__item,name_clan)
     print(list_data)
-    with open(f"data/schedule_{name_clan.lower()}.json","w") as fille:
-            json.dump(list_data,fille,indent=3,ensure_ascii=False)
+    await create_json(list_data,name_clan,"schedule")
+   
     return "God data "
 #Создание листа с ответами для пользователя 
 async def create_message(name_clan:str,type_operation:str):
     text_list = [] # Создание листа для текста
     match type_operation: # проверка на операций
         case "players": # проверка  если операция с игроками
-            with open(f"data/players_{name_clan.lower()}.json","r") as fille:# ишем нужный json с игроками
+            with open(f"data/{type_operation}_{name_clan.lower()}.json","r") as fille:# ишем нужный json с игроками
                 data = json.load(fille)
             print(data)
         case "schedule":   # проверка  если операция с мачеми
-            with open(f"data/schedule_{name_clan.lower()}.json","r") as fille:# ишем нужный json с мачеми коретной команде
+            with open(f"data/{type_operation}_{name_clan.lower()}.json","r") as fille:# ишем нужный json с мачеми коретной команде
                 data = json.load(fille)
             print(data)
     for item in data:
                 match type_operation:# проверка на операций
                     case "players": # проверка  если операция с игроками
-                        text = f"Игрок Имя:{item['Name']} Национальность:{item['Nasion']} Номер:{item['Number']}"#ответ с игроками 
+                        text = f"<b>Игрок</b>:\n<b>Имя:</b> {item['Name']} \n<b>Национальность:</b> {item['Nasion']}\n<b>Номер:</b> {item['Number']}"#ответ с игроками 
                     case "schedule":# проверка  если операция с мачеми
-                        text = f"Мачь: Дата и время: {item['Time_match']} Перва команда: {item['Team_Team1']} Втора команда: {item['Team_Team2']} Тип мача: {item['Match_Cat']}"#ответ с мачеми 
+                        text = f"<b>Мачь:</b> \n<b>Дата и время:</b> {item['Time_match']} \n<b>Перва команда:</b> {item['Team_Team1']} \n<b>Вторая команда:</b> {item['Team_Team2']} \n<b>Тип мача:</b> {item['Match_Cat']}"#ответ с мачеми 
                 text_list.append(text)# добовление в список
     list_players.clear()
     list_data.clear()
