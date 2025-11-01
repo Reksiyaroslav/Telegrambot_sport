@@ -21,3 +21,7 @@ text_message_stop = "Тебе нужно выбрать"
 text_help = (
     """Вам нужно назать на кнопку информация об команде и там выбрать что вам важно"""
 )
+text_barselona = "Барселона"
+text_bavariya = "Бавария"
+text_relal_madrit = "Реал Мадрит"
+text_clubs = "Выбар клана "
