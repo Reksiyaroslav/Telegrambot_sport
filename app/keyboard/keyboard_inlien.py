@@ -11,13 +11,13 @@ from app.text import (
     text_barselona,
     text_bavariya,
     text_relal_madrit,
-    text_clubs
+    text_clubs,
 )
 
 keyboard_main = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text=text_keyboard_main, callback_data="loream")],
-        [InlineKeyboardButton(text=text_clubs,callback_data="clubs")],
+        [InlineKeyboardButton(text=text_clubs, callback_data="clubs")],
     ]
 )
 
@@ -27,14 +27,14 @@ keyboard_status = InlineKeyboardMarkup(
         [InlineKeyboardButton(text=text_keyboar_winer, callback_data="winer")],
         [InlineKeyboardButton(text=text_message_tourney, callback_data="tourney")],
         [InlineKeyboardButton(text=text_keyboar_schedule, callback_data="schedule")],
-        [InlineKeyboardButton(text=text_keyboard_plaers, callback_data="plaers_data")],
-        [InlineKeyboardButton(text=text_keyboard_coach, callback_data="coach")],
+        [InlineKeyboardButton(text=text_keyboard_plaers, callback_data="players")],
+        [InlineKeyboardButton(text=text_keyboard_coach, callback_data="coauth")],
     ]
 )
 keyboard_clubs = InlineKeyboardMarkup(
     inline_keyboard=[
-        [InlineKeyboardButton(text=text_barselona,callback_data="barselona")],
-        [InlineKeyboardButton(text=text_bavariya,callback_data="bavariya")],
-        [InlineKeyboardButton(text=text_relal_madrit,callback_data="real madrit")],
+        [InlineKeyboardButton(text=text_barselona, callback_data="barselona")],
+        [InlineKeyboardButton(text=text_bavariya, callback_data="bavariya")],
+        [InlineKeyboardButton(text=text_relal_madrit, callback_data="real_madrid")],
     ]
 )
