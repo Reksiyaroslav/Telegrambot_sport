@@ -3,8 +3,13 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import CommandStart, Command
 from app.keyboard import keyboard_inlien as kb
 import app.func.func as fun
-from app.text import text_hello, text_group, text_help, text_club_varibal
-from app.list import list_club_list, list_key_list
+from app.text import (
+    text_hello, 
+    text_group,
+    text_help,
+    text_club_varibal,
+    text_club_var)
+from app.list import list_club_list
 
 router = Router()
 count = 0
@@ -29,8 +34,8 @@ async def help_start(message: Message):
 @router.callback_query(F.data == "clubs")
 async def info_clubs(callback: CallbackQuery):
     await callback.answer(text=text_club_varibal + callback.data)
-    await callback.message.answer("Выбери клуб который вам нужен")
-    await callback.message.answer(text_group, reply_markup=kb.keyboard_clubs)
+    await callback.message.answer("Выбирай клуб который вам нужен")
+    await callback.message.answer(text_club_var, reply_markup=kb.keyboard_clubs)
 
 
 @router.callback_query(F.data.in_(["bavariya", "real_madrid", "barselona"]))
@@ -67,14 +72,14 @@ async def handler_soup(message: Message):
     new_message = message.text.lower()
     if new_message in clubs:
         FConte.type_club = message.text
-        await message.answer(f"Вы выбрали <b>{message.text}</b>")
+        await message.answer(f"Вы выбрали: <b>{message.text}</b>")
     if (
         new_message == "schedule"
         or new_message == "players"
         or new_message == "coauth"
         and FConte.type_club != ""
     ):
-        message.answer(f"Вы выбрали <b>{message.text}</b>")
+        message.answer(f"Вы выбрали: <b>{message.text}</b>")
         text_full = await fun.create_message(FConte.type_club, message.text)
         await message.answer(text=text_full)
     if new_message == "loream":
