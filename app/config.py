@@ -3,7 +3,6 @@ import os
 import json
 import time
 
-
 async def key_in_dict(name_clan) -> bool:
     if os.path.exists(f"data/{name_clan}.json"):
         data = read_json(name_clan)
@@ -11,17 +10,14 @@ async def key_in_dict(name_clan) -> bool:
         return all(key in data for key in key_json)
     return False
 
-
 def create_json(data: dict, name_clan: str):
     with open(f"data/{name_clan}.json", "w") as fille:
         json.dump(data, fille, indent=3, ensure_ascii=False)
     return f"Create json"
 
-
 def read_json(name_club) -> dict:
     with open(f"data/{name_club}.json", "r") as fille:
         return json.load(fille)
-
 
 def update_json(date_update: list | str | dict, name_club: str, type_operation):
     data = read_json(name_club)
@@ -37,7 +33,6 @@ def update_json(date_update: list | str | dict, name_club: str, type_operation):
     else:
         data[type_operation] = date_update
     create_json(data, name_club)
-
 
 async def theer_day_fille(filename: str):
     now_time = time.time()
