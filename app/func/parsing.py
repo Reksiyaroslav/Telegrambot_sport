@@ -10,24 +10,25 @@ list_type = []
 heanders = {"Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
     "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0"}
 def clear_list():
+    # отчиска листов от  данных
     list_type.clear()
 #Получения линков чтобы не плодить их 
 async def parsing_html(url,type_operation,name_clan:str=None)->str:
     async with aiohttp.ClientSession() as session:
             reponse = await session.get(url=url,headers=heanders) #получения  ответа от сайта 
-            reponse_text = await reponse.text()
-            if type_operation =="loream":
-                with open(f"html/index_{type_operation}.html","w")as file :
-                    file.write(reponse_text)
+            reponse_text = await reponse.text() # преобразование в текст 
+            if type_operation =="loream":#проверка на тип операций 
+                with open(f"html/index_{type_operation}.html","w")as file :#сохранения в файл
+                    file.write(reponse_text) #запись в файл
             else :
                 with open(f"html/index_{type_operation}_{name_clan.lower()}.html","w")as file :
                     file.write(reponse_text)
-            return reponse_text
+            return reponse_text # возрашения текста страницы
 
 async def load_html(name_clan:str,type_operaion:str):
-    if type_operaion =="loream":
-            with open(f"html/index_{type_operaion}.html")as file :
-                text_html = file.read()
+    if type_operaion =="loream":# провека на тип данных
+            with open(f"html/index_{type_operaion}.html")as file :# окрытие файла на чтения 
+                text_html = file.read()# получения данных об странице с даннами из файла 
     else:
         with open(f"html/index_{type_operaion}_{name_clan}.html") as file :
             text_html = file.read()
@@ -55,19 +56,19 @@ async def parsing_loream ()->str:
         }
         create_json(dict_loream,"loream") 
 async def create_dict(list_type:list,type_operation:str):
-    return {type_operation:list_type}
+    return {type_operation:list_type} # преобразование листа в список 
     
 async def load_data(dict_types:ResultSet[Tag],type_operaion:str,type_players_or_name_clob_or=None):
-        match type_operaion:
+        match type_operaion: # определение типа операций 
             case "players":
                 for item in dict_types:
-                        number_plaer =  int(item.find("td",class_="col-1 col-first left-align").text)
-                        img_teg = item.find("td",class_= "col-2 left-align").find("img") 
-                        nasion_player =  img_teg.get("alt")if img_teg and img_teg.get("alt")  else "Not nassion plaerse"
-                        name_player = item.find("td",class_= "col-2 left-align").find("a").text 
-                        age_text:str = item.find("td",class_="col-3 center-align").text.strip()
-                        age_player = int(age_text) if age_text.isdigit() else "Not age plaerse"
-                        type_player =  item.find("td",class_="col-4 left-align col-position").text 
+                        number_plaer =  int(item.find("td",class_="col-1 col-first left-align").text) #номер игрока 
+                        img_teg = item.find("td",class_= "col-2 left-align").find("img") # получени тега фота
+                        nasion_player =  img_teg.get("alt")if img_teg and img_teg.get("alt")  else "Not nassion plaerse" # получения национальности игрока 
+                        name_player = item.find("td",class_= "col-2 left-align").find("a").text # имя игрока 
+                        age_text:str = item.find("td",class_="col-3 center-align").text.strip() # нахождения возраста игрока 
+                        age_player = int(age_text) if age_text.isdigit() else "Not age plaerse" # провека на есть возраст преобразование его в число противном случие его нет 
+                        type_player =  item.find("td",class_="col-4 left-align col-position").text # получени типа игрока
                         dict_players = {
                             name_player:
                             {
@@ -77,8 +78,8 @@ async def load_data(dict_types:ResultSet[Tag],type_operaion:str,type_players_or_
                             "Type plaer": type_player,
                             "Status": type_players_or_name_clob_or
                             }
-                        }
-                        list_type.append(dict_players)
+                        }# запись в словарь
+                        list_type.append(dict_players)# запись в списко уже готового игрока 
             case "schedule":
                 if type_players_or_name_clob_or == list_club_list[0]:
                     for  item in dict_types:
@@ -98,7 +99,7 @@ async def load_data(dict_types:ResultSet[Tag],type_operaion:str,type_players_or_
                             "Team_Team1": team_team1,
                             "Team_Team2": team_team2,
                             "Match_Cat":match_cat,
-                        })
+                        })# 
                 elif type_players_or_name_clob_or in (list_club_list[1],list_club_list[2]):
                     for  item in dict_types:
                         match_tag_date = item.find("div",class_="team-match__item-date")
@@ -134,7 +135,7 @@ async def load_data(dict_types:ResultSet[Tag],type_operaion:str,type_players_or_
                 })
             case "lose_winer":
                 pass               
-async def parsing_type_operaion(name_club,type_operaion):
+async def parsing_type_operaion(name_club:str,type_operaion:str):
     match type_operaion: 
         case  "players":
             if name_club in ("barselona","bavariya"):
