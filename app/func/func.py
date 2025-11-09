@@ -1,6 +1,5 @@
 from app.config import read_json
 
-
 # Создание  ответами для пользователя
 async def create_message(name_clan: str, type_operation: str = None) -> str:
     text_list = []  # Создание листа для текста
