@@ -146,6 +146,20 @@ async def load_data(dict_types:ResultSet[Tag],type_operaion:str,type_players_or_
                     "Nire_date":relult[1],
                     "Type_club": relult[2],
                 })
+            case "static_matchs":
+                dict_match = {}
+                for tr in dict_types:
+                    td_type_big = tr.find("td",class_="_big").text
+                    if (td_type_big in ("Сыгранные матчи","% владения мячом","Точность ударов"
+                                        ,"Реализация ударов (соперник)"
+                                        ,"Реализация ударов","Точность ударов (соперник)","Точность ударов")):
+                        td_start = tr.find("td",class_="_center _group-start _group-end").text
+                        dict_match.update({td_type_big:f"{td_start}"})
+                    else:
+                        td_start = tr.find("td",class_="_center _group-start").text
+                        td_end = tr.find("td",class_="_center _group-end").text
+                        dict_match.update({td_type_big:f"{td_start} , {td_end}"})
+                list_type.append(dict_match)
             case "lose_winer":
                 pass               
 async def parsing_type_operaion(name_club,type_operaion):
@@ -322,28 +336,68 @@ async def create_message(name_clan:str,type_operation:str=None)->str:
     else:     
         print(data[f"{type_operation}"])
         for item in data[f"{type_operation}"]:
-                    match type_operation:# проверка на операций
-                        case "players": # проверка  если операция с игроками
-                            for key in item:  
-                                text = f"<b>Игрок</b>:\n<b>Имя:</b> {key} \n<b>Национальность:</b> {item[key]['Nasion']}\n<b>Номер:</b> {item[key]['Number']}"#ответ с игроками 
-                        case "schedule":# проверка  если операция с мачеми
-                            text = f"""<b>Мачь:</b> \n<b>Дата и время:</b> {item['Time_match']} \n<b>Перва команда:</b> {item['Team_Team1']} \n <b>Вторая команда:</b> {item['Team_Team2']} \n<b>Тип мача:</b> {item['Match_Cat']}"""#ответ с мачеми
-                        case "coauth":
-                            text = f"""<b>Тренер</b>:\n<b>Имя:</b> {item['name']}\n<b>Национальность: {item['Nassion']}</b>\n<b>Дата рождения и возраст: </b>{item['Nire_date']}\n<b> Тренер команды:</b> {item['Type_club']}
-                        """    
-                    text_list.append(text)# добовление в список
+            match type_operation:# проверка на операций
+                case "players": # проверка  если операция с игроками
+                    for key in item:  
+                        text = f"<b>Игрок</b>:\n<b>Имя:</b> {key} \n<b>Национальность:</b> {item[key]['Nasion']}\n<b>Номер:</b> {item[key]['Number']}"#ответ с игроками 
+                case "schedule":# проверка  если операция с мачеми
+                    text = f"""<b>Мачь:</b> \n<b>Дата и время:</b> {item['Time_match']} \n<b>Перва команда:</b> {item['Team_Team1']} \n<b>Вторая команда:</b> {item['Team_Team2']} \n<b>Тип мача:</b> {item['Match_Cat']}"""#ответ с мачеми
+                case "coauth":
+                    text = f"""<b>Тренер</b>:\n<b>Имя:</b> {item['name']}\n<b>Национальность: {item['Nassion']}</b>\n<b>Дата рождения и возраст: </b>{item['Nire_date']}\n<b> Тренер команды:</b> {item['Type_club']}
+                """
+                case "static_matchs":
+                    for key in item:
+                        text = f"<b>{key}:</b> {item[key]}"  
+                        text_list.append(text)  
+                    break     
+            text_list.append(text)    
     text_full = "\n".join(text for text in text_list)
     return text_full# получения списка результатов для пользователя
+async def staitc_matcht(name_club:str ,type_operation:str   ):
+    match name_club:
+        case "barselona":
+            number_team = 272276
+        case "real_madrid":
+            number_team =272274
+        case "bavariya":
+            number_team =272294
+    url = f"https://www.championat.com/football/_ucl/tournament/6560/teams/{number_team}/tstat/"
+    if not os.path.exists(f"html/index_{type_operation}_{name_club}.html"):
+        src = await parsing_html(url=url,type_operation=type_operation,name_clan=name_club)
+    else:
+        src = await load_html(name_club,type_operation)
+    oder_ten  = await theer_day_fille(f"data/{name_club}.json") 
+    oder_key = await key_in_dict(name_club) 
+    if src != None or oder_key or oder_ten or os.path(f"data/{name_club}.json"):
+        soup_te = BeautifulSoup(src,"lxml")
+        list_tbody =  soup_te.find_all("tbody")
+        tbody_info = list_tbody[0]
+        tr_list = tbody_info.find_all("tr")
+        print(tr_list)
+        await load_data(tr_list,"static_matchs") 
+    print(list_type)
+    if not os.path.exists(f"data/{name_club}.json"):
+        dict_coauth = await create_dict(list_type,type_operation)
+        create_json(dict_coauth,name_club)
+    else : update_json(list_type,name_club=name_club,type_operation=type_operation)
+    
 
+
+    
 async def main():
    #await plaers_list("Barselona")
-   #await create_message("Barselona","players")
+   #print(await create_message("barselona","players"))
    #await plaers_list("Real Madrit")
    #await create_message("Real Madrit","players")
    #await coauth("barselona")
    #await create_message("barselona","coauth")
-   await parsing_loream()
-   print(await   create_message("loream"))
+   #await parsing_loream()
+   #print(await   create_message("loream"))
+   #await staitc_matcht("barselona","static_matchs")
+   print(await create_message("barselona","static_matchs"))
+   print(await create_message("barselona","coauth"))
+   print(await create_message("barselona","schedule"))
+   print(await create_message("barselona","players"))
    #await schedule("Bavariya")
    #await   create_message("Bavariya","schedule")
 if __name__ == "__main__":

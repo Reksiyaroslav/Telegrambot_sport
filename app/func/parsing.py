@@ -133,6 +133,20 @@ async def load_data(dict_types:ResultSet[Tag],type_operaion:str,type_players_or_
                     "Nire_date":relult[1],
                     "Type_club": relult[2],
                 })
+            case "static_matchs":
+                dict_match = {}
+                for tr in dict_types:
+                    td_type_big = tr.find("td",class_="_big").text
+                    if (td_type_big in ("Сыгранные матчи","% владения мячом","Точность ударов"
+                                        ,"Реализация ударов (соперник)"
+                                        ,"Реализация ударов","Точность ударов (соперник)","Точность ударов")):
+                        td_start = tr.find("td",class_="_center _group-start _group-end").text
+                        dict_match.update({td_type_big:f"Обрашая {td_start}"})
+                    else:
+                        td_start = tr.find("td",class_="_center _group-start").text
+                        td_end = tr.find("td",class_="_center _group-end").text
+                        dict_match.update({td_type_big:f"{td_start} , средняя {td_end}"})
+                list_type.append(dict_match)
             case "lose_winer":
                 pass               
 async def parsing_type_operaion(name_club:str,type_operaion:str):
@@ -157,6 +171,15 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
                 case "bavariya":
                     name_coath = "vensan-kompani"
             url = f"https://www.soccer.ru/coaches/{name_coath}?tournament=1380758"
+        case "static_matchs":
+            match name_club:
+                case "barselona":
+                    number_team = 272276
+                case "real_madrid":
+                    number_team =272274
+                case "bavariya":
+                    number_team =272294
+            url = f"https://www.championat.com/football/_ucl/tournament/6560/teams/{number_team}/tstat/"
         case "loream":
             url = "https://en.wikipedia.org/wiki/Lorem_ipsum" 
     if not os.path.exists(f"html/index_{type_operaion}_{name_club}.html"):
@@ -204,6 +227,11 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
                 tbody_iformaion = tbody_tag_list[0]
                 list_tr = tbody_iformaion.find_all("tr")
                 await load_data(list_tr,type_operaion=type_operaion,type_players_or_name_clob_or=name_tag_coath_text)
+            case "static_matchs":
+                list_tbody =  soup_Text.find_all("tbody")
+                tbody_info = list_tbody[0]
+                tr_list = tbody_info.find_all("tr")
+                await load_data(tr_list,type_operaion=type_operaion) 
     if not os.path.exists(f"data/{name_club}.json"):
         dict_type = await create_dict(list_type,type_operaion)
         create_json(dict_type,name_club)

@@ -40,7 +40,7 @@ async def varabal_club(callback: CallbackQuery):
     await callback.message.answer("Теперь что хотите найти")
     await callback.message.answer(text_group, reply_markup=kb.keyboard_status)
 
-@router.callback_query(F.data.in_(["players", "coauth", "schedule"]))
+@router.callback_query(F.data.in_(["players", "coauth", "schedule","static_matchs"]))
 async def info_type(callback: CallbackQuery):
     await callback.message.edit_text(f"<b>{callback.data.title()}</b>: <b>{FConte.type_club.title()}</b>")
     text_full = await fun.create_message(FConte.type_club, callback.data)

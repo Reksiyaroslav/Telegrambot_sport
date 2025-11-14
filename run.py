@@ -7,8 +7,7 @@ from app.handler.handler import router
 from app.list import list_club_list,list_key_list
 from app.func.parsing import parsing_type_operaion
 from app.config import theer_day_fille,key_in_dict
-async def main():
-    
+async def main():    
     for club in list_club_list:
         fille_name =f"data/{club}.json"
         is_file_fife_day= await theer_day_fille(fille_name)

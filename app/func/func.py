@@ -19,6 +19,11 @@ async def create_message(name_clan: str, type_operation: str = None) -> str:
                 case "coauth":
                     text = f"""<b>Тренер</b>:\n<b>Имя:</b> {item['name']}\n<b>Национальность</b>: {item['Nassion']}\n<b>Дата рождения и возраст: </b>{item['Nire_date']}\n<b>Тренер команды:</b> {item['Type_club']}
                         """
+                case "static_matchs":
+                    for key in item:
+                        text = f"<b>{key}:</b> {item[key]}"  
+                        text_list.append(text)  
+                    break     
             text_list.append(text)  # добовление в список
     text_full = "\n".join(text for text in text_list)
     return text_full  # получения списка результатов для пользователя

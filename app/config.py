@@ -6,7 +6,7 @@ import time
 async def key_in_dict(name_clan) -> bool:
     if os.path.exists(f"data/{name_clan}.json"):
         data = read_json(name_clan)
-        key_json = ("players", "schedule", "coauth")
+        key_json = ("players", "schedule", "coauth","static_matchs")
         return all(key in data for key in key_json)
     return False
 

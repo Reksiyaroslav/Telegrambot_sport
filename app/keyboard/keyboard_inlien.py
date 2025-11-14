@@ -5,7 +5,7 @@ from app.text import (
     text_keyboard_plaers,
     text_keyboard_coach,
     text_keyboar_lose,
-    text_keyboar_winer,
+    text_keyboar_static_matchs,
     text_keyboar_schedule,
     text_message_tourney,
     text_barselona,
@@ -24,7 +24,7 @@ keyboard_main = InlineKeyboardMarkup(
 keyboard_status = InlineKeyboardMarkup(
     inline_keyboard=[
         [InlineKeyboardButton(text=text_keyboar_lose, callback_data="lose")],
-        [InlineKeyboardButton(text=text_keyboar_winer, callback_data="winer")],
+        [InlineKeyboardButton(text=text_keyboar_static_matchs, callback_data="static_matchs")],
         [InlineKeyboardButton(text=text_message_tourney, callback_data="tourney")],
         [InlineKeyboardButton(text=text_keyboar_schedule, callback_data="schedule")],
         [InlineKeyboardButton(text=text_keyboard_plaers, callback_data="players")],
