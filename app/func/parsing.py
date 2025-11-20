@@ -2,13 +2,12 @@ import aiohttp
 import datetime
 import os
 from  bs4 import BeautifulSoup,Tag,ResultSet
-from app.config import create_json,update_json,key_in_dict,theer_day_fille
+from app.config import create_json,update_json,key_in_dict,theer_day_fille,remove_date,read_json
 from app.list import list_club_list
 src = ""
 list_type = []
 # Чтобы не думали что бот а человек зашёл к ним
-heanders = {"Accept":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:144.0) Gecko/20100101 Firefox/144.0"}
+heanders = {"User-Agent":"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:145.0) Gecko/20100101 Firefox/145.0"}
 def clear_list():
     # отчиска листов от  данных
     list_type.clear()
@@ -35,7 +34,7 @@ async def load_html(name_clan:str,type_operaion:str):
     return text_html
 #Получения данных об Loream пассхалка
 async def parsing_loream ()->str:
-    url = "https://en.wikipedia.org/wiki/Lorem_ipsum"  #url википедей 
+    url = "https://en.wikipedia.org/wiki/Lorem_ipsum"#url википедей 
    #Создание сесий для сайта 
     async with aiohttp.ClientSession() as session:
         reponse = await session.get(url=url,headers=heanders) #получения  ответа от сайта 
@@ -141,11 +140,11 @@ async def load_data(dict_types:ResultSet[Tag],type_operaion:str,type_players_or_
                                         ,"Реализация ударов (соперник)"
                                         ,"Реализация ударов","Точность ударов (соперник)","Точность ударов")):
                         td_start = tr.find("td",class_="_center _group-start _group-end").text
-                        dict_match.update({td_type_big:f"Обрашая {td_start}"})
+                        dict_match.update({td_type_big:f"Обращая {td_start}"})
                     else:
                         td_start = tr.find("td",class_="_center _group-start").text
                         td_end = tr.find("td",class_="_center _group-end").text
-                        dict_match.update({td_type_big:f"{td_start} , средняя {td_end}"})
+                        dict_match.update({td_type_big:f"{td_start}, средняя {td_end}"})
                 list_type.append(dict_match)
             case "lose_winer":
                 pass               
@@ -181,7 +180,7 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
                     number_team =272294
             url = f"https://www.championat.com/football/_ucl/tournament/6560/teams/{number_team}/tstat/"
         case "loream":
-            url = "https://en.wikipedia.org/wiki/Lorem_ipsum" 
+            url = "https://loremipsum.io/ru/" 
     if not os.path.exists(f"html/index_{type_operaion}_{name_club}.html"):
         src = await parsing_html(url,name_clan=name_club,type_operation=type_operaion)
     if type_operaion == "loream":
@@ -193,8 +192,8 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
     if type_operaion=="loream":
             soup_Text = BeautifulSoup(src,"lxml")
             parameter = soup_Text.find_all("p") # поиск всех тегов p 
-            if(len(parameter)>1): #проверка на то что p второй вхождения 
-                second_p = parameter[1] # получения 2 p
+            if(len(parameter)>0): #проверка на то что p второй вхождения 
+                second_p = parameter[0] # получения 2 p
                 text = second_p.text if second_p else "fsasfasffsd" # запись в текст данных с тега p если их нет то береберда 
             list_type.append(text)
     if not os.path.exists(f"data/{name_club}.json") or oder_ten or  not oder_key:
@@ -232,6 +231,7 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
                 tbody_info = list_tbody[0]
                 tr_list = tbody_info.find_all("tr")
                 await load_data(tr_list,type_operaion=type_operaion) 
+    print(list_type)
     if not os.path.exists(f"data/{name_club}.json"):
         dict_type = await create_dict(list_type,type_operaion)
         create_json(dict_type,name_club)
@@ -239,6 +239,8 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
         dict_type = await create_dict(list_type,type_operaion)
         name_club= type_operaion
         create_json(dict_type,name_club)
-    else : update_json(list_type,name_club=name_club,type_operation=type_operaion)
+    else :  
+        await remove_date(data=read_json(name_club),type_operation=type_operaion)
+        update_json(list_type,name_club=name_club,type_operation=type_operaion)
     clear_list()
 
