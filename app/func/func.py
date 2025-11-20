@@ -13,7 +13,7 @@ async def create_message(name_clan: str, type_operation: str = None) -> str:
             match type_operation:  # проверка на операций
                 case "players":  # проверка  если операция с игроками
                     for key in item:
-                        text = f"<b>Игрок</b>:\n<b>Имя:</b> {key} \n<b>Национальность:</b> {item[key]['Nasion']}\n<b>Номер:</b> {item[key]['Number']}"  # ответ с игроками
+                        text = f"<b>Игрок</b>:\n<b>Имя:</b> {key} \n<b>Национальность:</b> {item[key]['Nasion']}\n<b>Номер:</b> {item[key]['Number'] }\n<b>Тип Игрока:</b> {item[key]['Type plaer']}"  # ответ с игроками
                 case "schedule":  # проверка  если операция с мачеми
                     text = f"""<b>Матч:</b> \n<b>Дата и время:</b> {item['Time_match']} \n<b>Первая команда:</b> {item['Team_Team1']} \n<b>Вторая команда:</b> {item['Team_Team2']} \n<b>Тип мача:</b> {item['Match_Cat']}"""  # ответ с мачеми
                 case "coauth":
