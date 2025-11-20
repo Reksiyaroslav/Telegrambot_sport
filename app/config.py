@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import os
 import json
 import time
@@ -18,22 +18,47 @@ def create_json(data: dict, name_clan: str):
 def read_json(name_club) -> dict:
     with open(f"data/{name_club}.json", "r") as fille:
         return json.load(fille)
+def dict_in_object(date_update:dict,list_unic:list):
+    for element in list_unic:
+        if not isinstance(element,dict) and element==date_update:
+            return True
+    return False
+
 
 def update_json(date_update: list | str | dict, name_club: str, type_operation):
     data = read_json(name_club)
     current = data.get(type_operation)
     if not isinstance(current, list):
         current = []
-    if isinstance(date_update, list) and isinstance(date_update, list):
+    if isinstance(date_update, list):
         list_unic = list(current)
         for item in date_update:
-            if item not in list_unic:
-                list_unic.append(item)
-            data[type_operation] = list_unic
+            if isinstance(item,dict):
+                 list_unic.append(item)
+            else :
+                if item not in list_unic:
+                   list_unic.append(item) 
+        data[type_operation] = list_unic
     else:
         data[type_operation] = date_update
     create_json(data, name_club)
-
+async def remove_date(data:dict,type_operation):
+    if  type_operation not in  data:
+        return data
+    now_datetime = datetime.today() 
+    #str_datetime = datetime.strptime(now_datetime,"%d.%m.%Y %H:Y%")
+    list_update = []
+    for item in data[type_operation]:
+        datetimedata_str =item.get("Time_match")
+        if datetimedata_str:
+            datedata_datetime = datetime.strptime(datetimedata_str,"%d.%m.%Y %H:%M")
+            if now_datetime < datedata_datetime:
+                list_update.append(item)
+        else:
+            list_update.append(item)
+    data[type_operation] =  list_update
+    return data
+                
 async def theer_day_fille(filename: str):
     now_time = time.time()
     theer_age_day = now_time - 3 * 24 * 60 * 60
