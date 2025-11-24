@@ -20,7 +20,7 @@ async def parsing_html(url,type_operation,name_clan:str=None)->str:
                 with open(f"html/index_{type_operation}.html","w")as file :#сохранения в файл
                     file.write(reponse_text) #запись в файл
             else :
-                with open(f"html/index_{type_operation}_{name_clan.lower()}.html","w")as file :
+                with open(f"html/index_{type_operation}_{name_clan}.html","w")as file :
                     file.write(reponse_text)
             return reponse_text # возрашения текста страницы
 
@@ -32,28 +32,6 @@ async def load_html(name_clan:str,type_operaion:str):
         with open(f"html/index_{type_operaion}_{name_clan}.html") as file :
             text_html = file.read()
     return text_html
-#Получения данных об Loream пассхалка
-async def parsing_loream ()->str:
-    url = "https://en.wikipedia.org/wiki/Lorem_ipsum"#url википедей 
-   #Создание сесий для сайта 
-    async with aiohttp.ClientSession() as session:
-        reponse = await session.get(url=url,headers=heanders) #получения  ответа от сайта 
-        reponse_text = await reponse.text() # получения данных с кодировкой 
-        soup_Text = BeautifulSoup( reponse_text,"lxml") # обрашения к странице для извлечения данных 
-        containe= soup_Text.find("div",class_="mw-page-container-inner") # переход в div с классом  mw-page-container-inner
-        content_container =  containe.find("div",class_="mw-content-container")# переход в div с классом  mw-content-container-inner
-        main = content_container.find("main")# переход в main   
-        div_bodycontext = main.find("div",id="bodyContent") # переход в div с id  bodyContent
-        div_mw = div_bodycontext.find("div",class_="mw-body-content")# переход в div с классом  mw-body-content
-        div_mw1 = div_mw.find("div",class_="mw-content-ltr mw-parser-output") # переход в div с классом mw-content-ltr mw-parser-output
-        parameter = div_mw1.find_all("p") # поиск всех тегов p 
-        if(len(parameter)>1): #проверка на то что p второй вхождения 
-            second_p = parameter[1] # получения 2 p
-            text = second_p.text if second_p else "fsasfasffsd" # запись в текст данных с тега p если их нет то береберда 
-        dict_loream = {
-            "loream":text    
-        }
-        create_json(dict_loream,"loream") 
 async def create_dict(list_type:list,type_operation:str):
     return {type_operation:list_type} # преобразование листа в список 
     
@@ -145,16 +123,14 @@ async def load_data(dict_types:ResultSet[Tag],type_operaion:str,type_players_or_
                         td_start = tr.find("td",class_="_center _group-start").text
                         td_end = tr.find("td",class_="_center _group-end").text
                         dict_match.update({td_type_big:f"{td_start}, средняя {td_end}"})
-                list_type.append(dict_match)
-            case "lose_winer":
-                pass               
+                list_type.append(dict_match)              
 async def parsing_type_operaion(name_club:str,type_operaion:str):
     match type_operaion: 
         case  "players":
             if name_club in ("barselona","bavariya"):
                 url = f"https://www.soccer.ru/{name_club}?tournament=1380758"
             else:
-                url =f"https://www.soccer.ru/real"
+                url ="https://www.soccer.ru/real"
         case "schedule":
             if name_club=="barselona":
                 url = "https://fc-barcelona.ru/schedule/"
@@ -240,7 +216,10 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
         name_club= type_operaion
         create_json(dict_type,name_club)
     else :  
-        await remove_date(data=read_json(name_club),type_operation=type_operaion)
+        data_old = read_json(name_club)
+        if type_operaion =='schedule':
+            data_old_delete = await remove_date(data=data_old,type_operation=type_operaion)
+            create_json(data_old_delete,name_club)
         update_json(list_type,name_club=name_club,type_operation=type_operaion)
     clear_list()
 

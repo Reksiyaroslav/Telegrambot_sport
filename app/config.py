@@ -13,7 +13,7 @@ async def key_in_dict(name_clan) -> bool:
 def create_json(data: dict, name_clan: str):
     with open(f"data/{name_clan}.json", "w") as fille:
         json.dump(data, fille, indent=3, ensure_ascii=False)
-    return f"Create json"
+    return "Create json"
 
 def read_json(name_club) -> dict:
     with open(f"data/{name_club}.json", "r") as fille:
@@ -33,8 +33,9 @@ def update_json(date_update: list | str | dict, name_club: str, type_operation):
     if isinstance(date_update, list):
         list_unic = list(current)
         for item in date_update:
-            if isinstance(item,dict):
-                 list_unic.append(item)
+            if not any(isinstance(exsit,dict) and item == exsit for exsit in list_unic):
+                if item not in list_unic:
+                    list_unic.append(item)
             else :
                 if item not in list_unic:
                    list_unic.append(item) 
@@ -45,14 +46,18 @@ def update_json(date_update: list | str | dict, name_club: str, type_operation):
 async def remove_date(data:dict,type_operation):
     if  type_operation not in  data:
         return data
-    now_datetime = datetime.today() 
+    now_datetime = datetime.now() 
     #str_datetime = datetime.strptime(now_datetime,"%d.%m.%Y %H:Y%")
     list_update = []
     for item in data[type_operation]:
         datetimedata_str =item.get("Time_match")
         if datetimedata_str:
-            datedata_datetime = datetime.strptime(datetimedata_str,"%d.%m.%Y %H:%M")
-            if now_datetime < datedata_datetime:
+            try:
+                if ":" in datetimedata_str:
+                    datedata_datetime = datetime.strptime(datetimedata_str,"%d.%m.%Y %H:%M")
+                if now_datetime < datedata_datetime:
+                    list_update.append(item)
+            except ValueError:    
                 list_update.append(item)
         else:
             list_update.append(item)
@@ -61,7 +66,7 @@ async def remove_date(data:dict,type_operation):
                 
 async def theer_day_fille(filename: str):
     now_time = time.time()
-    theer_age_day = now_time - 3 * 24 * 60 * 60
+    theer_age_day = now_time - 2 * 24 * 60 * 60
     if os.path.exists(filename):
         time_fille_update = os.path.getctime(filename=filename)
         return time_fille_update < theer_age_day
