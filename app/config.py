@@ -68,5 +68,5 @@ async def theer_day_fille(filename: str):
     now_time = time.time()
     theer_age_day = now_time - 2 * 24 * 60 * 60
     if os.path.exists(filename):
-        time_fille_update = os.path.getctime(filename=filename)
+        time_fille_update = os.path.getmtime(filename=filename)
         return time_fille_update < theer_age_day
