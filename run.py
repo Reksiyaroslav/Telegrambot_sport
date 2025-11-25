@@ -9,7 +9,8 @@ from app.func.parsing import parsing_type_operaion
 from app.config import theer_day_fille,key_in_dict
 from tkinter import Tk,Label
 from PIL import ImageTk,Image
-def gui_windue():
+import threading
+def gui_window():
     root = Tk()
     root.geometry("450x450")
     root.title("Фото подлючение бота")
@@ -24,7 +25,8 @@ def gui_windue():
     # Запустите главный цикл Tkinter
     root.mainloop()
 
-async def main():    
+async def main():
+      
     for club in list_club_list:
         fille_name =f"data/{club}.json"
         is_file_fife_day= await theer_day_fille(fille_name)
@@ -41,10 +43,13 @@ async def main():
     bot = Bot(token=TOKE_BOT,
                     default=DefaultBotProperties(parse_mode="HTML")
     )
-    gui_windue()
     dis = Dispatcher()
     dis.include_router(router)
+    gui_thread = threading.Thread(target=gui_window, daemon=True)
+    gui_thread.start()
     await dis.start_polling(bot)
+    
+   
    
 if __name__ == "__main__":
     try:
