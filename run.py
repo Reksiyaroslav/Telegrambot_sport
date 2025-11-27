@@ -26,7 +26,6 @@ def gui_window():
     root.mainloop()
 
 async def main():
-      
     for club in list_club_list:
         fille_name =f"data/{club}.json"
         is_file_fife_day= await theer_day_fille(fille_name)

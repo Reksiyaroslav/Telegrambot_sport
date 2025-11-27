@@ -215,11 +215,12 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
         dict_type = await create_dict(list_type,type_operaion)
         name_club= type_operaion
         create_json(dict_type,name_club)
-    else :  
-        data_old = read_json(name_club)
-        if type_operaion =='schedule':
+    else : 
+        data_old = read_json(name_club=name_club) 
+        if type_operaion =='schedule' and  type_operaion  in data_old:
             data_old_delete = await remove_date(data=data_old,type_operation=type_operaion)
             create_json(data_old_delete,name_club)
-        update_json(list_type,name_club=name_club,type_operation=type_operaion)
+        else:
+            update_json(list_type,name_club=name_club,type_operation=type_operaion)
     clear_list()
 
