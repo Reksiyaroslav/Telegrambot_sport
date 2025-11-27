@@ -217,7 +217,7 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
         create_json(dict_type,name_club)
     else : 
         data_old = read_json(name_club=name_club) 
-        if type_operaion =='schedule' and  type_operaion  in data_old:
+        if  type_operaion  in data_old:
             data_old_delete = await remove_date(data=data_old,type_operation=type_operaion)
             create_json(data_old_delete,name_club)
         else:
