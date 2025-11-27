@@ -157,13 +157,14 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
             url = f"https://www.championat.com/football/_ucl/tournament/6560/teams/{number_team}/tstat/"
         case "loream":
             url = "https://loremipsum.io/ru/" 
-    if not os.path.exists(f"html/index_{type_operaion}_{name_club}.html"):
+    html_oder_there = await theer_day_fille(f"html/index_{type_operaion}_{name_club}.html")
+    if not os.path.exists(f"html/index_{type_operaion}_{name_club}.html") and html_oder_there:
         src = await parsing_html(url,name_clan=name_club,type_operation=type_operaion)
     if type_operaion == "loream":
         src =await parsing_html(url,type_operation=type_operaion)
     else:
         src = await load_html(name_club,type_operaion)
-    oder_ten  = await theer_day_fille(f"data/{name_club}.json") 
+    oder_theer  = await theer_day_fille(f"data/{name_club}.json") 
     oder_key = await key_in_dict(name_club) 
     if type_operaion=="loream":
             soup_Text = BeautifulSoup(src,"lxml")
@@ -172,7 +173,7 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
                 second_p = parameter[0] # получения 2 p
                 text = second_p.text if second_p else "fsasfasffsd" # запись в текст данных с тега p если их нет то береберда 
             list_type.append(text)
-    if not os.path.exists(f"data/{name_club}.json") or oder_ten or  not oder_key:
+    if not os.path.exists(f"data/{name_club}.json") or oder_theer or  not oder_key:
         soup_Text = BeautifulSoup(src,"lxml")
         match type_operaion:
             case "players":
