@@ -158,7 +158,7 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
         case "loream":
             url = "https://loremipsum.io/ru/" 
     html_oder_there = await theer_day_fille(f"html/index_{type_operaion}_{name_club}.html")
-    if not os.path.exists(f"html/index_{type_operaion}_{name_club}.html") and html_oder_there:
+    if not os.path.exists(f"html/index_{type_operaion}_{name_club}.html") or html_oder_there:
         src = await parsing_html(url,name_clan=name_club,type_operation=type_operaion)
     if type_operaion == "loream":
         src =await parsing_html(url,type_operation=type_operaion)
@@ -218,7 +218,7 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
         create_json(dict_type,name_club)
     else : 
         data_old = read_json(name_club=name_club) 
-        if  type_operaion  in data_old:
+        if  type_operaion=="schedule":
             data_old_delete = await remove_date(data=data_old,type_operation=type_operaion)
             create_json(data_old_delete,name_club)
         else:
