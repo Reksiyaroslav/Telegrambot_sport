@@ -70,3 +70,5 @@ async def theer_day_fille(filename: str):
     if os.path.exists(filename):
         time_fille_update = os.path.getmtime(filename=filename)
         return time_fille_update < theer_age_day
+async def delete_file (name_club:str,type_operaiton:str):
+        os.remove(f"html/index_{type_operaiton}_{name_club}.html")    

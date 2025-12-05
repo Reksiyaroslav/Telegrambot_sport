@@ -164,8 +164,8 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
         src =await parsing_html(url,type_operation=type_operaion)
     else:
         src = await load_html(name_club,type_operaion)
-    oder_theer  = await theer_day_fille(f"data/{name_club}.json") 
-    oder_key = await key_in_dict(name_club) 
+    oder_theer  = await theer_day_fille(f"data/{name_club}.json")
+    oder_key = await key_in_dict(name_clan=name_club) 
     if type_operaion=="loream":
             soup_Text = BeautifulSoup(src,"lxml")
             parameter = soup_Text.find_all("p") # поиск всех тегов p 
@@ -216,9 +216,9 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
         dict_type = await create_dict(list_type,type_operaion)
         name_club= type_operaion
         create_json(dict_type,name_club)
-    else : 
+    else: 
         data_old = read_json(name_club=name_club) 
-        if  type_operaion=="schedule":
+        if  type_operaion=="schedule"and type_operaion in data_old:
             data_old_delete = await remove_date(data=data_old,type_operation=type_operaion)
             create_json(data_old_delete,name_club)
         else:

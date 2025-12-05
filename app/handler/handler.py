@@ -46,10 +46,7 @@ async def info_type(callback: CallbackQuery):
     text_full = await fun.create_message(FConte.type_club, callback.data)
     await callback.message.answer(text=text_full)
 
-@router.callback_query(F.data == "winer")
-async def info_group(callback: CallbackQuery):
-    await callback.message.edit_text("Pass")
-    await callback.message.answer(text="пока не сделал")
+
 
 @router.callback_query(F.data == "loream")
 async def info_group(callback: CallbackQuery):
