@@ -33,10 +33,10 @@ async def passing_fille():
         if shoul_parsding:
             print(f"Пасинг дл команды {club}")
             for operation in list_key_list:
-                    if os.path.exists(f"html/index_{club}_{operation}.html"):
-                        await delete_file(club,operation)
-                    print(f"Выполннеи пасига дл {club} {operation}")
-                    await parsing_type_operaion(club,operation)
+                if os.path.exists(f"html/index_{club}_{operation}.html"):
+                    await delete_file(club,operation)
+                print(f"Выполннеи пасига дл {club} {operation}")
+                await parsing_type_operaion(club,operation)
         
 async def main():
     load_dotenv()

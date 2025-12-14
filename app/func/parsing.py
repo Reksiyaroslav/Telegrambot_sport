@@ -2,7 +2,7 @@ import aiohttp
 import datetime
 import os
 from  bs4 import BeautifulSoup,Tag,ResultSet
-from app.config import create_json,update_json,key_in_dict,theer_day_fille,remove_date,read_json
+from app.config import create_json,update_json,theer_day_fille,remove_date,read_json
 from app.list import list_club_list
 src = ""
 list_type = []
@@ -134,7 +134,7 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
         case "schedule":
             if name_club=="barselona":
                 url = "https://fc-barcelona.ru/schedule/"
-            else :
+            else:
                 url =f"https://www.euro-football.ru/team/{name_club}/match_comming"
         case "coauth":
             name_coath = ""
@@ -157,15 +157,16 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
             url = f"https://www.championat.com/football/_ucl/tournament/6560/teams/{number_team}/tstat/"
         case "loream":
             url = "https://loremipsum.io/ru/" 
+    print(url)
     html_oder_there = await theer_day_fille(f"html/index_{type_operaion}_{name_club}.html")
-    if not os.path.exists(f"html/index_{type_operaion}_{name_club}.html") or html_oder_there:
+    html_not_file = os.path.exists(f"html/index_{type_operaion}_{name_club}.html")
+    if html_not_file or html_oder_there:
         src = await parsing_html(url,name_clan=name_club,type_operation=type_operaion)
-    if type_operaion == "loream":
+    if not os.path.exists("html/index_loream.html") or await theer_day_fille("html/index_loream.html"):
         src =await parsing_html(url,type_operation=type_operaion)
     else:
         src = await load_html(name_club,type_operaion)
-    oder_theer  = await theer_day_fille(f"data/{name_club}.json")
-    oder_key = await key_in_dict(name_clan=name_club) 
+    not_file_data = not os.path.exists(f"data/{name_club}.json")
     if type_operaion=="loream":
             soup_Text = BeautifulSoup(src,"lxml")
             parameter = soup_Text.find_all("p") # поиск всех тегов p 
@@ -173,7 +174,7 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
                 second_p = parameter[0] # получения 2 p
                 text = second_p.text if second_p else "fsasfasffsd" # запись в текст данных с тега p если их нет то береберда 
             list_type.append(text)
-    if not os.path.exists(f"data/{name_club}.json") or oder_theer or  not oder_key:
+    else:
         soup_Text = BeautifulSoup(src,"lxml")
         match type_operaion:
             case "players":
@@ -209,7 +210,7 @@ async def parsing_type_operaion(name_club:str,type_operaion:str):
                 tr_list = tbody_info.find_all("tr")
                 await load_data(tr_list,type_operaion=type_operaion) 
     print(list_type)
-    if not os.path.exists(f"data/{name_club}.json"):
+    if not_file_data:
         dict_type = await create_dict(list_type,type_operaion)
         create_json(dict_type,name_club)
     if type_operaion=="loream":
