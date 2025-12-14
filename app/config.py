@@ -33,9 +33,14 @@ def update_json(date_update: list | str | dict, name_club: str, type_operation):
     if isinstance(date_update, list):
         list_unic = list(current)
         for item in date_update:
-            if not any(isinstance(exsit,dict) and item == exsit for exsit in list_unic):
-                if item not in list_unic:
-                    list_unic.append(item)
+            if isinstance(item,dict):
+                found = False
+                for extect_item in list_unic:
+                    if isinstance(extect_item,dict) and extect_item== item:
+                        found =True
+                        break
+            if not found:
+                list_unic.append(item)
             else :
                 if item not in list_unic:
                    list_unic.append(item) 
